@@ -14,5 +14,6 @@ async function onFormSubmit(evt) {
   const searchQuery = refs.input.value;
   console.log(searchQuery);
 
-  getPhotos(searchQuery, 1);
+  const photos = await getPhotos(searchQuery, 1);
+  console.log(photos);
 }
