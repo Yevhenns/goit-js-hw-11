@@ -1,3 +1,5 @@
+import { getPhotos } from './utils/apiService';
+
 const refs = {
   form: document.querySelector('#search-form'),
   input: document.querySelector('[name="searchQuery"]'),
@@ -9,6 +11,8 @@ refs.form.addEventListener('submit', onFormSubmit);
 async function onFormSubmit(evt) {
   evt.preventDefault();
 
-  const inputData = refs.input.value;
-  console.log(inputData);
+  const searchQuery = refs.input.value;
+  console.log(searchQuery);
+
+  getPhotos(searchQuery, 1);
 }
