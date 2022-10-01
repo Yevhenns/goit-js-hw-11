@@ -1,4 +1,5 @@
 import { getPhotos } from './utils/apiService';
+import { createGalleryMarkup } from './utils/markup';
 
 const refs = {
   form: document.querySelector('#search-form'),
@@ -16,4 +17,6 @@ async function onFormSubmit(evt) {
 
   const photos = await getPhotos(searchQuery, 1);
   console.log(photos);
+
+  createGalleryMarkup(photos);
 }
