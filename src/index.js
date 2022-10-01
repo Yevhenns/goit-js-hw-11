@@ -6,6 +6,7 @@ const refs = {
   input: document.querySelector('[name="searchQuery"]'),
   btn: document.querySelector('[type="submit"]'),
   gallery: document.querySelector('.gallery'),
+  loadMore: document.querySelector('.load-more'),
 };
 
 refs.form.addEventListener('submit', onFormSubmit);
