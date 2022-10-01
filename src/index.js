@@ -5,6 +5,7 @@ const refs = {
   form: document.querySelector('#search-form'),
   input: document.querySelector('[name="searchQuery"]'),
   btn: document.querySelector('[type="submit"]'),
+  gallery: document.querySelector('.gallery'),
 };
 
 refs.form.addEventListener('submit', onFormSubmit);
@@ -18,5 +19,5 @@ async function onFormSubmit(evt) {
   const photos = await getPhotos(searchQuery, 1);
   console.log(photos);
 
-  createGalleryMarkup(photos);
+  refs.gallery.innerHTML = createGalleryMarkup(photos);
 }
