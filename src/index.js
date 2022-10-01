@@ -1,5 +1,7 @@
 import apiService from './utils/apiService';
 import { createGalleryMarkup } from './utils/markup';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 
 const refs = {
   form: document.querySelector('#search-form'),
@@ -8,6 +10,15 @@ const refs = {
   gallery: document.querySelector('.gallery'),
   loadMoreBtn: document.querySelector('.load-more'),
 };
+
+const lightbox = new SimpleLightbox('.gallery a', {
+  captions: true,
+  captionPosition: 'bottom',
+  captionDelay: 250,
+  animationSpeed: 250,
+});
+console.log(lightbox);
+
 const apiPhotoService = new apiService();
 
 refs.form.addEventListener('submit', onFormSubmit);
@@ -22,6 +33,7 @@ async function onFormSubmit(evt) {
   const photos = await apiPhotoService.getPhotos();
 
   refs.gallery.innerHTML = createGalleryMarkup(photos);
+  lightbox.refresh();
 }
 
 refs.loadMoreBtn.addEventListener('click', loadMore);
@@ -30,4 +42,5 @@ async function loadMore() {
   apiPhotoService.incrementPage();
   const photos = await apiPhotoService.getPhotos();
   refs.gallery.insertAdjacentHTML('beforeend', createGalleryMarkup(photos));
+  lightbox.refresh();
 }
