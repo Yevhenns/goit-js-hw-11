@@ -1,5 +1,3 @@
-// import { getPhotos } from './apiService';
-
 export function createGalleryMarkup(photos) {
   return photos
     .map(
