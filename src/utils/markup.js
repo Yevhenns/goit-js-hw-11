@@ -1,23 +1,35 @@
 import { getPhotos } from './apiService';
 
-function createGalleryMarkup(images) {
-  images.map(({ webformatURL, tags, likes, views, comments, downloads }) => {
-    return `<div class="photo-card">
-  <img src="" alt="" loading="lazy" />
+export function createGalleryMarkup(images) {
+  return images
+    .map(
+      ({
+        webformatURL,
+        largeImageURLtags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => {
+        return `<div class="photo-card">
+      <a fref=${largeImageURLtags}>
+      <img src="${webformatURL}" alt="${tags}" loading="lazy" />
   <div class="info">
     <p class="info-item">
-      <b>Likes</b>
+      <b>Likes${likes}</b>
     </p>
     <p class="info-item">
-      <b>Views</b>
+      <b>Views${views}</b>
     </p>
     <p class="info-item">
-      <b>Comments</b>
+      <b>Comments${comments}</b>
     </p>
     <p class="info-item">
-      <b>Downloads</b>
+      <b>Downloads${downloads}</b>
     </p>
-  </div>
-</div>`;
-  });
+  </div></a>
+  </div>`;
+      }
+    )
+    .join('');
 }
