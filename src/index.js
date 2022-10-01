@@ -16,9 +16,9 @@ async function onFormSubmit(evt) {
   evt.preventDefault();
 
   const searchQuery = evt.currentTarget.searchQuery.value;
-  console.log(searchQuery);
 
   apiPhotoService.query = searchQuery;
+  apiPhotoService.page = 1;
   const photos = await apiPhotoService.getPhotos();
 
   refs.gallery.innerHTML = createGalleryMarkup(photos);
