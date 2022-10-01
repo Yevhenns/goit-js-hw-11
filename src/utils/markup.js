@@ -1,7 +1,7 @@
 import { getPhotos } from './apiService';
 
-export function createGalleryMarkup(images) {
-  return images
+export function createGalleryMarkup(photos) {
+  return photos
     .map(
       ({
         webformatURL,
