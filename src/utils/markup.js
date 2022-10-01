@@ -4,6 +4,7 @@ export function createGalleryMarkup(photos) {
       ({
         webformatURL,
         largeImageURLtags,
+        tags,
         likes,
         views,
         comments,
