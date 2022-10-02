@@ -2,6 +2,7 @@ import apiService from './utils/apiService';
 import { createGalleryMarkup } from './utils/markup';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
+import { Notify } from 'notiflix';
 
 const refs = {
   form: document.querySelector('#search-form'),
@@ -30,10 +31,13 @@ async function onFormSubmit(evt) {
 
   apiPhotoService.query = searchQuery;
   apiPhotoService.page = 1;
-  const photos = await apiPhotoService.getPhotos();
-
-  refs.gallery.innerHTML = createGalleryMarkup(photos);
-  lightbox.refresh();
+  try {
+    const photos = await apiPhotoService.getPhotos();
+    refs.gallery.innerHTML = createGalleryMarkup(photos);
+    lightbox.refresh();
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 refs.loadMoreBtn.addEventListener('click', loadMore);
