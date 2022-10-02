@@ -2,7 +2,6 @@ import './sass/index.scss';
 
 import NewsApiService from './utils/apiService';
 import renderCard from './utils/markup';
-//import axios from 'axios';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
@@ -40,10 +39,7 @@ function onSearch(e) {
   }
 
   isShown = 0;
-  // onRenderGallery();
   fetchGallery();
-  // onRenderGallery();
-  // onRenderGallery(hits);
 }
 
 function onLoadMore() {
