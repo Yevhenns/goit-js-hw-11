@@ -20,6 +20,9 @@ export default class apiService {
     const {
       data: { hits },
     } = await agent.get(`?q=${this.searchQuery}&page=${this.page}`);
+    if (!hits.length) {
+      throw new Error();
+    }
     return hits;
   }
   get query() {
