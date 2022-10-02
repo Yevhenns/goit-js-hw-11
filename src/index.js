@@ -48,6 +48,9 @@
 //   refs.gallery.insertAdjacentHTML('beforeend', createGalleryMarkup(photos));
 //   lightbox.refresh();
 // }
+
+// _________________
+
 import './sass/index.scss';
 
 import NewsApiService from './utils/apiService';
