@@ -27,16 +27,6 @@ const newsApiService = new NewsApiService();
 refs.searchForm.addEventListener('submit', onSearch);
 refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
-// Бесконечного скролла
-const options = {
-  rootMargin: '50px',
-  root: null,
-  threshold: 0.3,
-};
-const observer = new IntersectionObserver(onLoadMore, options);
-//observer.observe(refs.loadMoreBtn);
-
-//////---- FUNCTION ----////
 function onSearch(e) {
   e.preventDefault();
 
@@ -50,11 +40,10 @@ function onSearch(e) {
   }
 
   isShown = 0;
+  // onRenderGallery();
   fetchGallery();
-  onRenderGallery(hits);
-
-  ///// если нужен бесконечній скролл добавляем ст.48
-  //observer.observe(refs.loadMoreBtn);
+  // onRenderGallery();
+  // onRenderGallery(hits);
 }
 
 function onLoadMore() {
@@ -63,8 +52,6 @@ function onLoadMore() {
 }
 
 async function fetchGallery() {
-  // refs.loadMoreBtn.classList.add('is-hidden');
-
   const r = await newsApiService.fetchGallery();
   const { hits, total } = r;
   isShown += hits.length;
@@ -81,19 +68,16 @@ async function fetchGallery() {
   isShown += hits.length;
 
   if (isShown < total) {
-    // Показывае кнопку
     Notify.success(`Hooray! We found ${total} images !!!`);
     refs.loadMoreBtn.classList.remove('is-hidden');
   }
-  // Если пользователь дошел до конца коллекции, пряч кнопку и выводи уведомление с текстом:
+
   if (isShown >= total) {
     Notify.info('We re sorry, but you have reached the end of search results.');
   }
 }
 
-// ф-ция рендерит массив (дата) картинок согласно разметки (renderCard)
 function onRenderGallery(elements) {
-  //console.log(elements);
   const markup = elements
     .map(
       ({
