@@ -1,5 +1,3 @@
-import './sass/index.scss';
-
 import NewsApiService from './utils/apiService';
 import renderCard from './utils/markup';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
