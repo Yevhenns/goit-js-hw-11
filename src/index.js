@@ -48,89 +48,100 @@
 //   refs.gallery.insertAdjacentHTML('beforeend', createGalleryMarkup(photos));
 //   lightbox.refresh();
 // }
-import Notiflix from 'notiflix';
-import axios from 'axios';
+import './sass/index.scss';
+
+import NewsApiService from './utils/apiService';
+import renderCard from './utils/markup';
+//import axios from 'axios';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 
-const searchForm = document.querySelector('#search-form');
-const galleryCard = document.querySelector('.gallery');
-const loadMoreBtn = document.querySelector('.load-more');
+let lightbox = new SimpleLightbox('.photo-card a', {
+  captions: true,
+  captionsData: 'alt',
+  captionDelay: 250,
+});
 
-searchForm.addEventListener('submit', onSubmitForm);
-loadMoreBtn.addEventListener('click', onLoadMore);
+const refs = {
+  searchForm: document.querySelector('.search-form'),
+  galleryContainer: document.querySelector('.gallery'),
+  loadMoreBtn: document.querySelector('.load-more'),
+};
+let isShown = 0;
+const newsApiService = new NewsApiService();
 
-let searchValue = '';
-let pageNumber = 1;
-loadMoreBtn.hidden = true;
+refs.searchForm.addEventListener('submit', onSearch);
+refs.loadMoreBtn.addEventListener('click', onLoadMore);
 
-function onSubmitForm(e) {
+// Бесконечного скролла
+const options = {
+  rootMargin: '50px',
+  root: null,
+  threshold: 0.3,
+};
+const observer = new IntersectionObserver(onLoadMore, options);
+//observer.observe(refs.loadMoreBtn);
+
+//////---- FUNCTION ----////
+function onSearch(e) {
   e.preventDefault();
-  loadMoreBtn.hidden = false;
 
-  clearGallaryCard();
-  searchValue = e.currentTarget.elements.searchQuery.value;
+  refs.galleryContainer.innerHTML = '';
+  newsApiService.query = e.currentTarget.elements.searchQuery.value.trim();
+  newsApiService.resetPage();
 
-  if (searchValue === '') {
-    loadMoreBtn.hidden = true;
-    return Notiflix.Notify.warning(
-      'Sorry, there are no images matching your search query. Please try again.'
-    );
+  if (newsApiService.query === '') {
+    Notify.warning('Please, fill the main field');
+    return;
   }
 
-  pageNumber = 1;
-  fetchInfo().then(renderImage);
+  isShown = 0;
+  fetchGallery();
+  onRenderGallery(hits);
+
+  ///// если нужен бесконечній скролл добавляем ст.48
+  //observer.observe(refs.loadMoreBtn);
 }
 
 function onLoadMore() {
-  fetchInfo()
-    .then(renderImage)
-    .catch(data => {
-      loadMoreBtn.hidden = true;
-      Notiflix.Notify.info(
-        `We're sorry, but you've reached the end of search results.`
-      );
-    });
+  newsApiService.incrementPage();
+  fetchGallery();
 }
 
-async function fetchInfo() {
-  const url = `https://pixabay.com/api/`;
+async function fetchGallery() {
+  refs.loadMoreBtn.classList.add('is-hidden');
 
-  return await axios
-    .get(url, {
-      params: {
-        key: '30165080-69dc7af91b4e9c1a4c0e45d49',
-        q: `${searchValue}`,
-        image_type: 'photo',
-        orientation: 'horizontal',
-        safesearch: 'true',
-        per_page: 40,
-        page: `${pageNumber}`,
-      },
-    })
+  const r = await newsApiService.fetchGallery();
+  const { hits, total } = r;
+  isShown += hits.length;
 
-    .then(res => {
-      pageNumber += 1;
+  if (!hits.length) {
+    Notify.warning(
+      `Sorry, there are no images matching your search query. Please try again.`
+    );
+    refs.loadMoreBtn.classList.add('is-hidden');
+    return;
+  }
 
-      if (res.data.totalHits === 0) {
-        loadMoreBtn.hidden = true;
-        Notiflix.Notify.warning(
-          'Sorry, there are no images matching your search query. Please try again.'
-        );
-      }
+  onRenderGallery(hits);
+  isShown += hits.length;
 
-      if (pageNumber === 2 && res.data.totalHits > 0) {
-        Notiflix.Notify.success(
-          `Hooray! We found ${res.data.totalHits} images.`
-        );
-      }
-
-      return res.data;
-    });
+  if (isShown < total) {
+    // Показывае кнопку
+    Notify.success(`Hooray! We found ${total} images !!!`);
+    refs.loadMoreBtn.classList.remove('is-hidden');
+  }
+  // Если пользователь дошел до конца коллекции, пряч кнопку и выводи уведомление с текстом:
+  if (isShown >= total) {
+    Notify.info('We re sorry, but you have reached the end of search results.');
+  }
 }
 
-function renderImage(data) {
-  const card = data.hits
+// ф-ция рендерит массив (дата) картинок согласно разметки (renderCard)
+function onRenderGallery(elements) {
+  //console.log(elements);
+  const markup = elements
     .map(
       ({
         webformatURL,
@@ -141,35 +152,32 @@ function renderImage(data) {
         comments,
         downloads,
       }) => {
-        return `
-    <div class="photo-card">
-        <a class="gallery-link" href="${largeImageURL}">
-   <img src="${webformatURL}" alt="${tags}"  loading="lazy" /></a>
-  <div class="info">
-     <p class="info-item">
-      <b>Likes ${likes}</b>
-    </p>
-    <p class="info-item">
-       <b>Views ${views}</b>
-     </p>
-     <p class="info-item">
-       <b>Comments ${comments}</b>
-     </p>
-    <p class="info-item">
-       <b>Downloads ${downloads}</b>
-     </p>
-     </div>
-   </div>`;
+        return `<div class="photo-card">
+    <a href="${largeImageURL}">
+      <img class="photo-img" src="${webformatURL}" alt="${tags}" loading="lazy" />
+    </a>
+    <div class="info">
+      <p class="info-item">
+        <b>Likes</b>
+        ${likes}
+      </p>
+      <p class="info-item">
+        <b>Views</b>
+        ${views}
+      </p>
+      <p class="info-item">
+        <b>Comments</b>
+        ${comments}
+      </p>
+      <p class="info-item">
+        <b>Downloads</b>
+        ${downloads}
+      </p>
+    </div>
+    </div>`;
       }
     )
     .join('');
-
-  galleryCard.insertAdjacentHTML('beforeend', card);
-
-  let galleryEl = new SimpleLightbox('.gallery a', {});
-  galleryEl.on(('show.simplelightbox', function () {}));
-}
-
-function clearGallaryCard() {
-  galleryCard.innerHTML = '';
+  refs.galleryContainer.insertAdjacentHTML('beforeend', markup);
+  lightbox.refresh();
 }
